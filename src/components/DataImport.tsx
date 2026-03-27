@@ -78,7 +78,7 @@ export default function DataImport() {
           const retailerId = row.retailer_id?.trim();
           const month = row.month?.trim();
           const branch = row.branch?.trim();
-          if (!retailerId || !month || !branch) {
+          if (!retailerId || !month || !branch || branch === 'EUROPEAN AGENCY') {
             skipped++;
             continue;
           }

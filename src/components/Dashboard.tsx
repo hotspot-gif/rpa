@@ -10,7 +10,7 @@ import {
   LayoutDashboard, Upload, LogOut, Search, User, Building2, Shield, FileDown, ChevronLeft, ChevronRight, Users,
 } from 'lucide-react';
 import { generatePDF } from '@/utils/pdfExport';
-import { BRANCH_TO_ZONES, normalizeBranch } from '@/data/mockData';
+import { ALL_BRANCHES, BRANCH_TO_ZONES, normalizeBranch } from '@/data/mockData';
 
 const VIEWS = { DASHBOARD: 'dashboard', IMPORT: 'import', USERS: 'users' } as const;
 type View = (typeof VIEWS)[keyof typeof VIEWS];
@@ -53,14 +53,15 @@ export default function Dashboard() {
           // Filter based on user role
           let availableBranches: string[] = [];
           if (user.role === 'HS-ADMIN') {
-            // Admin can see all branches that have data
-            availableBranches = (uniqueBranches as string[]);
+            // Admin can see all standard branches.
+            // This ensures we see all valid branches even if pagination misses some.
+            availableBranches = ALL_BRANCHES;
           } else {
             // Other roles only see their assigned branches that have data
             const userBranches = (user.branches || []).map(normalizeBranch);
-            availableBranches = (uniqueBranches as string[]).filter((b: string) => 
-              userBranches.includes(normalizeBranch(b))
-            );
+            availableBranches = (uniqueBranches as string[])
+              .filter((b: string) => ALL_BRANCHES.includes(b)) // Filter out invalid ones like "EUROPEAN AGENCY"
+              .filter((b: string) => userBranches.includes(normalizeBranch(b)));
           }
           
           setBranches(availableBranches);
